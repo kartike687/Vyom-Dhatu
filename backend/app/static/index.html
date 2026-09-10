@@ -1,0 +1,2197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MOIL Manganese Mine Intelligence & Digital Twin Command Centre</title>
+  <style>
+    :root {
+      --bg-dark: #070b13;
+      --bg-card: rgba(15, 23, 42, 0.85);
+      --bg-card-hover: rgba(30, 41, 59, 0.9);
+      --border-subtle: rgba(51, 65, 85, 0.6);
+      --border-glow: rgba(56, 189, 248, 0.35);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-purple: #a855f7;
+      --font-mono: "SF Mono", "Fira Code", Consolas, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #070b13; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+    /* Top Command Header */
+    header {
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(7, 11, 19, 0.95) 100%);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 12px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .logo-badge {
+      background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);
+      color: white;
+      font-weight: 800;
+      font-size: 16px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      letter-spacing: 1px;
+      box-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
+    }
+    .brand-titles h1 {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+    .brand-titles p {
+      font-size: 11px;
+      color: var(--accent-cyan);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid transparent;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-sim {
+      background: rgba(14, 165, 233, 0.15);
+      border-color: rgba(14, 165, 233, 0.4);
+      color: #38bdf8;
+    }
+    .badge-status {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+    .badge-warn {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+    }
+    .badge-crit {
+      background: rgba(244, 63, 94, 0.15);
+      border-color: rgba(244, 63, 94, 0.4);
+      color: #fb7185;
+    }
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor;
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+    .btn {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid var(--border-subtle);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.18s ease;
+    }
+    .btn:hover {
+      background: #334155;
+      color: white;
+      border-color: #475569;
+    }
+    .btn-judge {
+      background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+      color: #000;
+      font-weight: 700;
+      border: none;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.45);
+    }
+    .btn-judge:hover {
+      background: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);
+      transform: translateY(-1px);
+    }
+    .btn-action {
+      background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
+      color: white;
+      border: none;
+      box-shadow: 0 0 14px rgba(13, 148, 136, 0.35);
+    }
+    .btn-action:hover {
+      filter: brightness(1.15);
+      transform: translateY(-1px);
+    }
+
+    /* Disclaimer Ribbon */
+    .disclaimer-strip {
+      background: rgba(15, 23, 42, 0.95);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 6px 24px;
+      font-size: 11px;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .disclaimer-tag {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+    }
+
+    /* KPI Cards Strip */
+    .kpi-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      padding: 16px 24px;
+    }
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 14px 16px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .kpi-card:hover {
+      border-color: var(--border-glow);
+    }
+    .kpi-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: #334155;
+    }
+    .kpi-cyan::before { background: var(--accent-cyan); }
+    .kpi-emerald::before { background: var(--accent-emerald); }
+    .kpi-amber::before { background: var(--accent-amber); }
+    .kpi-rose::before { background: var(--accent-rose); }
+    .kpi-purple::before { background: var(--accent-purple); }
+
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .kpi-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      font-family: var(--font-mono);
+    }
+    .kpi-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Tab Navigation */
+    .tab-bar {
+      display: flex;
+      gap: 4px;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--border-subtle);
+      overflow-x: auto;
+      background: rgba(10, 15, 26, 0.8);
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 12px 16px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .tab-btn:hover {
+      color: #fff;
+    }
+    .tab-btn.active {
+      color: #38bdf8;
+      border-bottom-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.05);
+    }
+
+    /* Main Content Area */
+    main {
+      padding: 20px 24px;
+      min-height: calc(100vh - 220px);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr;
+      gap: 20px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 1024px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 18px 20px;
+      position: relative;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-subtitle {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    /* Digital Twin Material Movement Flow */
+    .flow-pipeline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 16px;
+      background: rgba(10, 15, 26, 0.9);
+      border-radius: 8px;
+      border: 1px dashed #334155;
+      overflow-x: auto;
+      gap: 12px;
+      position: relative;
+    }
+    .flow-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      min-width: 110px;
+      position: relative;
+      z-index: 2;
+    }
+    .flow-icon-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #1e293b;
+      border: 2px solid #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 8px;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.3);
+      position: relative;
+    }
+    .flow-node-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .flow-node-metric {
+      font-size: 10px;
+      color: #94a3b8;
+      font-family: var(--font-mono);
+      margin-top: 2px;
+    }
+    .flow-connector {
+      flex: 1;
+      height: 3px;
+      background: linear-gradient(90deg, #38bdf8 0%, #10b981 100%);
+      position: relative;
+      min-width: 40px;
+      margin: 0 -8px 24px -8px;
+    }
+    .flow-particle {
+      width: 7px;
+      height: 7px;
+      background: #fff;
+      border-radius: 50%;
+      position: absolute;
+      top: -2px;
+      box-shadow: 0 0 8px #38bdf8;
+      animation: flowMove 2.4s infinite linear;
+    }
+    @keyframes flowMove {
+      0% { left: 0%; opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { left: 100%; opacity: 0; }
+    }
+
+    /* GIS Mine Map */
+    .map-container {
+      position: relative;
+      height: 480px;
+      background: #090e17;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+    #gisCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+    }
+    .map-overlay-card {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 290px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid var(--border-glow);
+      border-radius: 8px;
+      padding: 14px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      z-index: 10;
+    }
+    .map-legend {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--border-subtle);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 10px;
+      color: #cbd5e1;
+      display: flex;
+      gap: 12px;
+      z-index: 10;
+    }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+    .legend-box { width: 10px; height: 10px; border-radius: 2px; }
+
+    /* 3D Block Model Canvas */
+    .three-container {
+      position: relative;
+      height: 450px;
+      background: radial-gradient(circle at center, #0f172a 0%, #030712 100%);
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+    #threeCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Sliders */
+    .slider-group {
+      margin-bottom: 16px;
+    }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 6px;
+      color: #cbd5e1;
+    }
+    .slider-val {
+      font-weight: 700;
+      color: var(--accent-cyan);
+      font-family: var(--font-mono);
+    }
+    input[type=range] {
+      width: 100%;
+      height: 5px;
+      border-radius: 3px;
+      background: #334155;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #38bdf8;
+      cursor: pointer;
+      box-shadow: 0 0 8px #38bdf8;
+    }
+
+    /* Horizontal SHAP Contribution Bar */
+    .shap-item {
+      margin-bottom: 12px;
+    }
+    .shap-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+    .shap-bar-bg {
+      height: 10px;
+      background: #1e293b;
+      border-radius: 5px;
+      overflow: hidden;
+      display: flex;
+    }
+    .shap-bar-fill {
+      height: 100%;
+      border-radius: 5px;
+      transition: width 0.4s ease;
+    }
+
+    /* Fleet Cards Grid */
+    .fleet-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .fleet-card {
+      background: #0f172a;
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 12px;
+      transition: transform 0.15s;
+    }
+    .fleet-card:hover { transform: translateY(-2px); border-color: #475569; }
+    .fleet-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .fleet-id {
+      font-size: 13px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: #fff;
+    }
+
+    /* Tables */
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      text-align: left;
+    }
+    table.data-table th {
+      color: var(--text-dim);
+      font-weight: 600;
+      padding: 8px 10px;
+      border-bottom: 1px solid #334155;
+      text-transform: uppercase;
+    }
+    table.data-table td {
+      padding: 9px 10px;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+      color: #cbd5e1;
+    }
+    table.data-table tr:hover td {
+      background: rgba(30, 41, 59, 0.5);
+    }
+
+    /* Judge Mode Overlay */
+    #judgeModal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(3, 7, 18, 0.92);
+      backdrop-filter: blur(14px);
+      z-index: 500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .judge-box {
+      background: #0f172a;
+      border: 2px solid var(--accent-amber);
+      box-shadow: 0 0 35px rgba(245, 158, 11, 0.3);
+      border-radius: 12px;
+      max-width: 820px;
+      width: 100%;
+      padding: 28px;
+      position: relative;
+    }
+    .judge-step-badge {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+    .judge-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .judge-desc {
+      font-size: 14px;
+      color: #cbd5e1;
+      margin-bottom: 24px;
+    }
+    .judge-metrics-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .judge-metric-box {
+      background: #1e293b;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      text-align: center;
+    }
+    .judge-metric-num {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--accent-cyan);
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Command Header -->
+  <header>
+    <div class="header-top">
+      <div class="brand-section">
+        <div class="logo-badge">MOIL</div>
+        <div class="brand-titles">
+          <h1>MANGANESE INTELLIGENCE COMMAND CENTRE</h1>
+          <p>AI + Earth Observation + Mine Digital Twin &bull; Balaghat / Sausar Manganese Belt</p>
+        </div>
+      </div>
+      <div class="header-controls">
+        <span class="badge badge-sim"><span class="pulse-dot"></span>SIMULATION MODE (SEED: 26009)</span>
+        <span class="badge badge-status" id="telemetryBadge"><span class="pulse-dot"></span>GIS &amp; FLEET TELEMETRY: SYNCED</span>
+        
+        <select id="roleSelector" class="btn" style="background:#0f172a; padding:6px 10px;">
+          <option>Role: Mine Planner / Operations Head</option>
+          <option>Role: Chief Geologist &amp; Exploration Lead</option>
+          <option>Role: Fleet &amp; Maintenance Engineer</option>
+          <option>Role: Executive Management / MOIL Board</option>
+        </select>
+        
+        <button class="btn btn-judge" onclick="openJudgeMode()">⭐ START SIH DEMO / JUDGE MODE</button>
+        <button class="btn" id="fallbackToggleBtn" onclick="toggleFallback()">⚠ Fallback Mode</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Scientific Disclaimer Strip -->
+  <div class="disclaimer-strip">
+    <span class="disclaimer-tag">SCIENTIFIC GUARDRAIL</span>
+    <span>AI Prospectivity Scores represent decision-support exploration targets, NOT certified reserves. Environmental features (NDVI, soil moisture, rainfall) model operational weather risk and surface alteration, not direct subsurface manganese detection.</span>
+  </div>
+
+  <!-- KPI Cards Strip -->
+  <section class="kpi-container" id="kpiStrip">
+    <div class="kpi-card kpi-cyan">
+      <div class="kpi-label">AI Prospectivity Index</div>
+      <div class="kpi-val" id="kpiProspectivity">87.4%</div>
+      <div class="kpi-sub">Priority: <strong style="color:#38bdf8;">VERY HIGH</strong></div>
+    </div>
+    <div class="kpi-card kpi-purple">
+      <div class="kpi-label">Estimated Exploration Target</div>
+      <div class="kpi-val" id="kpiResource">2.84 MT</div>
+      <div class="kpi-sub">90% CI: 2.31 – 3.36 MT</div>
+    </div>
+    <div class="kpi-card kpi-emerald">
+      <div class="kpi-label">Today's Output</div>
+      <div class="kpi-val" id="kpiTodayProd">48,600 T</div>
+      <div class="kpi-sub">Monthly Target: 52,000 T</div>
+    </div>
+    <div class="kpi-card kpi-rose">
+      <div class="kpi-label">Production Shortfall Risk</div>
+      <div class="kpi-val" id="kpiShortfallRisk" style="color:#fb7185;">82.9%</div>
+      <div class="kpi-sub">Gap: <span id="kpiGap" style="color:#f43f5e; font-weight:700;">-5,248 T (HIGH)</span></div>
+    </div>
+    <div class="kpi-card kpi-amber">
+      <div class="kpi-label">Fleet Availability</div>
+      <div class="kpi-val" id="kpiFleetAvail">81.2%</div>
+      <div class="kpi-sub">11 Nodes (EX-02 Offline)</div>
+    </div>
+    <div class="kpi-card kpi-cyan">
+      <div class="kpi-label">Operational Weather Risk</div>
+      <div class="kpi-val" id="kpiWeatherRisk" style="color:#fbbf24;">HIGH</div>
+      <div class="kpi-sub">Monsoon Rain: 182 mm</div>
+    </div>
+  </section>
+
+  <!-- Navigation Tabs -->
+  <nav class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('cmd')">🏭 Command Centre &amp; Twin</button>
+    <button class="tab-btn" onclick="switchTab('space')">🛰 Space Intelligence &amp; GIS</button>
+    <button class="tab-btn" onclick="switchTab('prospectivity')">🧭 Manganese Prospectivity</button>
+    <button class="tab-btn" onclick="switchTab('subsurface')">🧊 3D Subsurface &amp; Reserves</button>
+    <button class="tab-btn" onclick="switchTab('forecast')">📈 Production Forecast &amp; Root Cause</button>
+    <button class="tab-btn" onclick="switchTab('equipment')">🚛 Equipment Digital Twin</button>
+    <button class="tab-btn" onclick="switchTab('whatif')">⚡ What-If Simulator &amp; Optimizer</button>
+    <button class="tab-btn" onclick="switchTab('executive')">📊 Executive &amp; Audit Log</button>
+  </nav>
+
+  <!-- Main Content -->
+  <main>
+
+    <!-- TAB 1: COMMAND CENTRE -->
+    <section id="tab-cmd" class="tab-content active">
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-header">
+          <div>
+            <div class="card-title">LIVE DIGITAL TWIN — ORE EXTRACTION &amp; DISPATCH PIPELINE</div>
+            <div class="card-subtitle">Real-time simulation of material movement across pit, crusher, and dispatch loops</div>
+          </div>
+          <span class="badge badge-sim">FLOW RATE: 210 TPH</span>
+        </div>
+        <div class="flow-pipeline">
+          <div class="flow-node">
+            <div class="flow-icon-circle">⛰</div>
+            <div class="flow-node-title">ORE SUPPLY</div>
+            <div class="flow-node-metric">Zone A Bench 4</div>
+            <span class="badge badge-status" style="margin-top:4px;">RESERVE READY</span>
+          </div>
+          <div class="flow-connector"><div class="flow-particle"></div></div>
+          <div class="flow-node">
+            <div class="flow-icon-circle">🚜</div>
+            <div class="flow-node-title">EXCAVATION</div>
+            <div class="flow-node-metric">EX-01 (92%) / EX-02 (64%)</div>
+            <span class="badge badge-warn" style="margin-top:4px;">SHOVEL BOTTLENECK</span>
+          </div>
+          <div class="flow-connector"><div class="flow-particle" style="animation-delay:0.8s;"></div></div>
+          <div class="flow-node">
+            <div class="flow-icon-circle">🚛</div>
+            <div class="flow-node-title">HAULAGE</div>
+            <div class="flow-node-metric">5 Active 60T Dumpers</div>
+            <span class="badge badge-sim" style="margin-top:4px;">HT-04 REROUTED</span>
+          </div>
+          <div class="flow-connector"><div class="flow-particle" style="animation-delay:1.6s;"></div></div>
+          <div class="flow-node">
+            <div class="flow-icon-circle">⚙</div>
+            <div class="flow-node-title">PRIMARY CRUSHER</div>
+            <div class="flow-node-metric">CR-01 (91% Uptime)</div>
+            <span class="badge badge-status" style="margin-top:4px;">315 TPH</span>
+          </div>
+          <div class="flow-connector"><div class="flow-particle" style="animation-delay:2.0s;"></div></div>
+          <div class="flow-node">
+            <div class="flow-icon-circle">📦</div>
+            <div class="flow-node-title">ROM STOCKPILE</div>
+            <div class="flow-node-metric">14,200 T Grade 34%</div>
+            <span class="badge badge-status" style="margin-top:4px;">STABLE</span>
+          </div>
+          <div class="flow-connector"><div class="flow-particle" style="animation-delay:2.4s;"></div></div>
+          <div class="flow-node">
+            <div class="flow-icon-circle">🚂</div>
+            <div class="flow-node-title">RAIL DISPATCH</div>
+            <div class="flow-node-metric">Balaghat Rake Siding</div>
+            <span class="badge badge-status" style="margin-top:4px;">ON SCHEDULE</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">ACTIVE MINING INTELLIGENCE ALERTS</div>
+            <span class="badge badge-crit">3 HIGH PRIORITY</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="background:rgba(244,63,94,0.1); border-left:4px solid #f43f5e; padding:12px; border-radius:4px;">
+              <div style="display:flex; justify-content:space-between; font-weight:700; color:#fb7185; font-size:12px;">
+                <span>🔴 CRITICAL — PRODUCTION SHORTFALL RISK: 82.9%</span>
+                <span>09:42 AM</span>
+              </div>
+              <p style="font-size:12px; color:#cbd5e1; margin-top:4px;">Predicted gap of -5,248 tonnes against 52,000 T monthly target driven by EX-02 maintenance and 182 mm monsoon downpour.</p>
+              <div style="margin-top:8px;">
+                <button class="btn btn-action" onclick="switchTab('whatif')">Resolve via AI Optimizer &rarr;</button>
+              </div>
+            </div>
+
+            <div style="background:rgba(245,158,11,0.1); border-left:4px solid #f59e0b; padding:12px; border-radius:4px;">
+              <div style="display:flex; justify-content:space-between; font-weight:700; color:#fbbf24; font-size:12px;">
+                <span>🟠 WARNING — BLAST B-17 DELAYED (12 HOURS)</span>
+                <span>08:15 AM</span>
+              </div>
+              <p style="font-size:12px; color:#cbd5e1; margin-top:4px;">Pit wetness restricts ANFO blast hole charging. Potential production impact: -1,400 tonnes muckpile availability.</p>
+            </div>
+
+            <div style="background:rgba(16,185,129,0.1); border-left:4px solid #10b981; padding:12px; border-radius:4px;">
+              <div style="display:flex; justify-content:space-between; font-weight:700; color:#34d399; font-size:12px;">
+                <span>🟢 OPPORTUNITY — ZONE A HIGH-PROSPECTIVITY DETECTED</span>
+                <span>YESTERDAY</span>
+              </div>
+              <p style="font-size:12px; color:#cbd5e1; margin-top:4px;">AI prospectivity score: 91.8% (Confidence 87%). Mansar schist / Gondite contact shows high structural fault density.</p>
+              <div style="margin-top:8px;">
+                <button class="btn" onclick="switchTab('prospectivity')">Inspect Exploration Targets &rarr;</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">AI MITIGATION ACTION SUMMARY</div>
+            <span class="badge badge-status">OPTIMIZER READY</span>
+          </div>
+          <div style="font-size:12px; color:#94a3b8; margin-bottom:12px;">The OR constraint optimization engine has generated 4 prioritized operational levers to recover shortfalls:</div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="background:#1e293b; padding:10px 12px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong style="color:#fff; font-size:12px;">1. Redeploy HT-04 to Zone B</strong>
+                <div style="font-size:10px; color:#94a3b8;">High-grade haul loop cycle reduction</div>
+              </div>
+              <span style="color:#34d399; font-weight:700; font-family:var(--font-mono);">+2,100 T</span>
+            </div>
+            <div style="background:#1e293b; padding:10px 12px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong style="color:#fff; font-size:12px;">2. Reschedule Blast B-17</strong>
+                <div style="font-size:10px; color:#94a3b8;">Advance blast to afternoon dry window</div>
+              </div>
+              <span style="color:#34d399; font-weight:700; font-family:var(--font-mono);">+1,400 T</span>
+            </div>
+            <div style="background:#1e293b; padding:10px 12px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong style="color:#fff; font-size:12px;">3. Expedite EX-02 Maintenance</strong>
+                <div style="font-size:10px; color:#94a3b8;">Hydraulic seal PM release 12h early</div>
+              </div>
+              <span style="color:#34d399; font-weight:700; font-family:var(--font-mono);">+1,000 T</span>
+            </div>
+            <div style="background:#1e293b; padding:10px 12px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong style="color:#fff; font-size:12px;">4. Extend Crusher Window +1.5h</strong>
+                <div style="font-size:10px; color:#94a3b8;">Absorb truck surge &amp; off-peak tariff</div>
+              </div>
+              <span style="color:#34d399; font-weight:700; font-family:var(--font-mono);">+800 T</span>
+            </div>
+          </div>
+          <div style="margin-top:14px; padding-top:10px; border-top:1px solid #334155; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:10px; color:#94a3b8;">TOTAL RECOVERABLE</div>
+              <div style="font-size:18px; font-weight:800; color:#38bdf8; font-family:var(--font-mono);">+5,300 TONNES</div>
+            </div>
+            <button class="btn btn-action" onclick="applyOptimization()">Apply Interventions</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: SPACE INTELLIGENCE -->
+    <section id="tab-space" class="tab-content">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">EARTH OBSERVATION &amp; SATELLITE DERIVED METRICS</div>
+            <span class="badge badge-sim">SENTINEL-2 + BHUVAN THEMATIC</span>
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-bottom:20px;">
+            <div style="background:#090e17; padding:12px; border-radius:6px; border:1px solid #334155;">
+              <div style="font-size:10px; color:#94a3b8;">24H RAINFALL</div>
+              <div style="font-size:20px; font-weight:800; color:#38bdf8; font-family:var(--font-mono);" id="spaceRain">182 mm</div>
+              <div style="font-size:9px; color:#fb7185;">Monsoon Cloudburst</div>
+            </div>
+            <div style="background:#090e17; padding:12px; border-radius:6px; border:1px solid #334155;">
+              <div style="font-size:10px; color:#94a3b8;">SOIL MOISTURE (VOL)</div>
+              <div style="font-size:20px; font-weight:800; color:#38bdf8; font-family:var(--font-mono);" id="spaceMoist">0.43</div>
+              <div style="font-size:9px; color:#fbbf24;">Pit Floor Slick</div>
+            </div>
+            <div style="background:#090e17; padding:12px; border-radius:6px; border:1px solid #334155;">
+              <div style="font-size:10px; color:#94a3b8;">VEGETATION (NDVI)</div>
+              <div style="font-size:20px; font-weight:800; color:#10b981; font-family:var(--font-mono);">0.31</div>
+              <div style="font-size:9px; color:#94a3b8;">Dry Deciduous Canopy</div>
+            </div>
+            <div style="background:#090e17; padding:12px; border-radius:6px; border:1px solid #334155;">
+              <div style="font-size:10px; color:#94a3b8;">WATER INDEX (NDWI)</div>
+              <div style="font-size:20px; font-weight:800; color:#38bdf8; font-family:var(--font-mono);">-0.12</div>
+              <div style="font-size:9px; color:#94a3b8;">Surface Ponding Moderate</div>
+            </div>
+            <div style="background:#090e17; padding:12px; border-radius:6px; border:1px solid #334155;">
+              <div style="font-size:10px; color:#94a3b8;">LAND SURFACE TEMP</div>
+              <div style="font-size:20px; font-weight:800; color:#f59e0b; font-family:var(--font-mono);">29.4°C</div>
+              <div style="font-size:9px; color:#94a3b8;">Thermal Infrared TIRS</div>
+            </div>
+            <div style="background:#090e17; padding:12px; border-radius:6px; border:1px solid #334155;">
+              <div style="font-size:10px; color:#94a3b8;">BARE SOIL INDEX (BSI)</div>
+              <div style="font-size:20px; font-weight:800; color:#e2e8f0; font-family:var(--font-mono);">0.68</div>
+              <div style="font-size:9px; color:#94a3b8;">Exposed Quarry Overburden</div>
+            </div>
+          </div>
+
+          <div class="card-header" style="margin-top:10px;">
+            <div class="card-title">SPACE INTELLIGENCE TIMELINE SIMULATOR</div>
+          </div>
+          <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">Adjust rainfall and observe operational risk propagation into haulage velocity and shortfall risk:</p>
+          <div class="slider-group">
+            <div class="slider-header">
+              <span>Simulated Rainfall Parameter:</span>
+              <span class="slider-val" id="timelineRainVal">182 mm</span>
+            </div>
+            <input type="range" id="timelineRainSlider" min="0" max="250" value="182" oninput="onTimelineRainChange(this.value)">
+          </div>
+          <div style="background:#090e17; padding:14px; border-radius:6px; border:1px solid #334155; font-size:12px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <span>Haul Road Friction Impact:</span>
+              <strong style="color:#fb7185;" id="spaceHaulStatus">Rolling Resistance +34% (Max 15 km/h)</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <span>Blasting Readiness:</span>
+              <strong style="color:#fbbf24;" id="spaceBlastStatus">Wet Blast-Hole Delay Recommended</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span>Crusher Feed Moisture:</span>
+              <strong style="color:#f43f5e;" id="spaceCrusherStatus">Chute Bridging Alert</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">BHUVAN / SENTINEL SPECTRAL COMPOSITE</div>
+            <span class="badge badge-status">GEOREFERENCED</span>
+          </div>
+          <div style="height:280px; background:#040711; border-radius:6px; position:relative; overflow:hidden; border:1px solid #334155; display:flex; align-items:center; justify-content:center;">
+            <svg viewBox="0 0 400 280" style="width:100%; height:100%;">
+              <!-- Simulated Satellite Band Composite with Mineral Indices -->
+              <defs>
+                <radialGradient id="satGlow" cx="50%" cy="50%" r="60%">
+                  <stop offset="0%" stop-color="#0284c7" stop-opacity="0.35"/>
+                  <stop offset="60%" stop-color="#0d9488" stop-opacity="0.2"/>
+                  <stop offset="100%" stop-color="#040711" stop-opacity="0.9"/>
+                </radialGradient>
+              </defs>
+              <rect width="400" height="280" fill="#070d18"/>
+              <circle cx="200" cy="140" r="160" fill="url(#satGlow)"/>
+              <!-- Contour lines -->
+              <path d="M 20,80 Q 120,40 220,90 T 380,60" fill="none" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="4,4"/>
+              <path d="M 10,140 Q 150,110 240,150 T 390,130" fill="none" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="4,4"/>
+              <path d="M 30,210 Q 130,180 260,220 T 370,190" fill="none" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="4,4"/>
+              <!-- Fault Lineaments -->
+              <line x1="80" y1="40" x2="310" y2="230" stroke="#f43f5e" stroke-width="2" stroke-dasharray="6,3"/>
+              <line x1="140" y1="30" x2="260" y2="250" stroke="#fbbf24" stroke-width="1.5"/>
+              <!-- High prospectivity anomaly patches -->
+              <ellipse cx="140" cy="90" rx="35" ry="25" fill="rgba(244,63,94,0.4)" stroke="#f43f5e" stroke-width="1.5"/>
+              <text x="140" y="93" fill="#fff" font-size="9" font-weight="700" text-anchor="middle">ZONE A (91%)</text>
+              <ellipse cx="270" cy="160" rx="30" ry="20" fill="rgba(245,158,11,0.35)" stroke="#f59e0b" stroke-width="1.5"/>
+              <text x="270" y="163" fill="#fff" font-size="9" font-weight="700" text-anchor="middle">ZONE B (68%)</text>
+              <!-- Mine infrastructure markers -->
+              <circle cx="200" cy="140" r="5" fill="#38bdf8"/>
+              <text x="200" y="156" fill="#38bdf8" font-size="9" text-anchor="middle">Central Pit</text>
+            </svg>
+            <div style="position:absolute; bottom:10px; right:10px; background:rgba(15,23,42,0.85); padding:4px 8px; border-radius:4px; font-size:9px; color:#94a3b8;">
+              Band Ratio SWIR/NIR &bull; ISRO Bhuvan Grid
+            </div>
+          </div>
+          <div style="margin-top:14px; font-size:11px; color:#94a3b8;">
+            <strong>Methodology Note:</strong> Clay/OH and Ferrous Iron band ratios detect hydrothermal alteration signatures indicative of Sausar Group manganiferous gondite contacts. Surface NDVI is masked to filter agricultural overburden.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: MANGANESE PROSPECTIVITY -->
+    <section id="tab-prospectivity" class="tab-content">
+      <div class="card-header" style="margin-bottom:12px;">
+        <div>
+          <div class="card-title">AI MANGANESE PROSPECTIVITY &amp; EXPLORATION MAP (ENGINE A)</div>
+          <div class="card-subtitle">Select ML Model to evaluate 400 raster cells across the 15x15 km exploration perimeter</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <label style="font-size:12px; color:#94a3b8;">Model:</label>
+          <select id="prospectivityModelSelect" class="btn" onchange="loadProspectivityData(this.value)">
+            <option value="XGBoost">XGBoost Classifier (ROC-AUC: 0.977)</option>
+            <option value="Random Forest">Random Forest Classifier (ROC-AUC: 0.994)</option>
+            <option value="Gradient Boosting">Gradient Boosting (ROC-AUC: 0.966)</option>
+            <option value="Logistic Regression">Logistic Regression Baseline (ROC-AUC: 0.998)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="map-container">
+          <canvas id="gisCanvas"></canvas>
+          <div class="map-legend">
+            <div class="legend-item"><div class="legend-box" style="background:#f43f5e;"></div>VERY HIGH (&gt;80%)</div>
+            <div class="legend-item"><div class="legend-box" style="background:#f59e0b;"></div>HIGH (60-80%)</div>
+            <div class="legend-item"><div class="legend-box" style="background:#eab308;"></div>MEDIUM (40-60%)</div>
+            <div class="legend-item"><div class="legend-box" style="background:#0284c7;"></div>LOW (&lt;40%)</div>
+          </div>
+          <div class="map-overlay-card" id="zoneDetailCard">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <strong style="color:#fff; font-size:13px;" id="zoneCardName">Zone A - North Balaghat</strong>
+              <span class="badge badge-crit" id="zoneCardPriority">VERY HIGH</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:12px;">
+              <span>Prospectivity Score:</span>
+              <strong style="color:#f43f5e; font-family:var(--font-mono);" id="zoneCardScore">91.8%</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
+              <span>Confidence Score:</span>
+              <strong style="color:#38bdf8; font-family:var(--font-mono);" id="zoneCardConfidence">87.2%</strong>
+            </div>
+            <div style="font-size:11px; color:#cbd5e1; margin-bottom:10px;" id="zoneCardRec">
+              Prioritize infill exploratory core drilling and detailed mineralogical assay.
+            </div>
+            <button class="btn btn-action" style="width:100%; justify-content:center;" onclick="simulateDrillOnSelectedZone()">
+              🔬 Simulate Drill Hole Core
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-header">
+              <div class="card-title">DOMINANT GEOLOGICAL FEATURE IMPORTANCE</div>
+              <span class="badge badge-sim">SHAP ATTRIBUTION</span>
+            </div>
+            <div id="featureImportanceList">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <div class="card" id="drillResultCard" style="display:none;">
+            <div class="card-header">
+              <div class="card-title">SIMULATED DRILL CORE LOGGING</div>
+              <span class="badge badge-sim" id="drillHoleId">SIM-HOLE-01</span>
+            </div>
+            <div style="font-size:11px; color:#94a3b8; margin-bottom:8px;">
+              Simulated core intercept at clicked geological contact:
+            </div>
+            <div id="drillIntervalsList" style="display:flex; flex-direction:column; gap:6px; font-size:11px;">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: 3D SUBSURFACE & RESERVES -->
+    <section id="tab-subsurface" class="tab-content">
+      <div class="grid-2">
+        <div>
+          <div class="three-container">
+            <canvas id="threeCanvas"></canvas>
+            <div style="position:absolute; top:12px; left:12px; background:rgba(15,23,42,0.9); padding:8px 12px; border-radius:6px; border:1px solid #334155; font-size:11px;">
+              <div><strong>3D OREBODY BLOCK MODEL (VOXELS)</strong></div>
+              <div style="color:#94a3b8; font-size:10px;">Drag to Rotate &bull; Stratigraphy 0 to 90m Depth</div>
+            </div>
+            <div style="position:absolute; bottom:12px; right:12px; background:rgba(15,23,42,0.9); padding:6px 12px; border-radius:6px; font-size:10px; display:flex; gap:10px;">
+              <span><span style="color:#ec4899;">■</span> High Grade Mn (>36%)</span>
+              <span><span style="color:#8b5cf6;">■</span> Medium Grade Mn (26-36%)</span>
+              <span><span style="color:#92400e;">■</span> Laterite Overburden</span>
+              <span><span style="color:#475569;">■</span> Waste Rock</span>
+            </div>
+          </div>
+          <div style="margin-top:12px; display:flex; align-items:center; gap:12px;">
+            <label style="font-size:12px; color:#94a3b8; white-space:nowrap;">Depth Slicing Filter:</label>
+            <input type="range" id="depthSlider" min="0" max="90" value="0" style="flex:1;" oninput="onDepthFilterChange(this.value)">
+            <span id="depthValText" style="font-family:var(--font-mono); font-size:12px; color:#38bdf8;">All Depths</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-header">
+              <div class="card-title">EDUCATIONAL RESERVE ESTIMATION SIMULATOR</div>
+              <span class="badge badge-sim">MONTE CARLO 90% CI</span>
+            </div>
+            <div style="font-size:11px; color:#94a3b8; margin-bottom:12px;">
+              Calculates resource tonnage: Volume = Area &times; Thickness &bull; Tonnage = Volume &times; Density &bull; Recoverable = Tonnage &times; Recovery Factor
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; font-size:12px;">
+              <div style="background:#1e293b; padding:10px; border-radius:6px;">
+                <span style="color:#94a3b8;">Est. Geological Resource:</span>
+                <div style="font-size:18px; font-weight:800; color:#fff; font-family:var(--font-mono);">2.84 MT</div>
+                <span style="font-size:10px; color:#38bdf8;">90% CI: 2.31 – 3.36 MT</span>
+              </div>
+              <div style="background:#1e293b; padding:10px; border-radius:6px;">
+                <span style="color:#94a3b8;">Recoverable Tonnage (82%):</span>
+                <div style="font-size:18px; font-weight:800; color:#10b981; font-family:var(--font-mono);">2.33 MT</div>
+                <span style="font-size:10px; color:#34d399;">90% CI: 1.89 – 2.75 MT</span>
+              </div>
+              <div style="background:#1e293b; padding:10px; border-radius:6px;">
+                <span style="color:#94a3b8;">Average Manganese Grade:</span>
+                <div style="font-size:16px; font-weight:700; color:#ec4899; font-family:var(--font-mono);">33.5% Mn</div>
+                <span style="font-size:10px; color:#94a3b8;">High-Grade Braunite</span>
+              </div>
+              <div style="background:#1e293b; padding:10px; border-radius:6px;">
+                <span style="color:#94a3b8;">Average Density:</span>
+                <div style="font-size:16px; font-weight:700; color:#e2e8f0; font-family:var(--font-mono);">3.88 t/m³</div>
+                <span style="font-size:10px; color:#94a3b8;">Heavy Manganese Oxides</span>
+              </div>
+            </div>
+            <div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); padding:10px; border-radius:6px; font-size:11px; color:#fbbf24;">
+              <strong>Disclaimer:</strong> Simulated educational resource model based on synthetic drill holes. Does NOT constitute statutory reserve certification under UNFC/JORC standards.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: PRODUCTION FORECAST & ROOT CAUSE -->
+    <section id="tab-forecast" class="tab-content">
+      <div class="card-header" style="margin-bottom:14px;">
+        <div>
+          <div class="card-title">30-DAY PRODUCTION SHORTFALL FORECAST (ENGINE B)</div>
+          <div class="card-subtitle">Evaluating SARIMA baseline vs Random Forest vs XGBoost with 90% confidence envelope</div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <select id="prodModelSelect" class="btn" onchange="loadForecastData(this.value)">
+            <option value="XGBoost Regressor">XGBoost Regressor (Best Model, R²: 0.581)</option>
+            <option value="Random Forest Regressor">Random Forest Regressor (R²: 0.547)</option>
+            <option value="SARIMA / Autoregressive Baseline">SARIMA / Autoregressive Baseline</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div style="height:280px; position:relative;">
+            <canvas id="forecastCanvas" style="width:100%; height:100%;"></canvas>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:11px; color:#94a3b8;">
+            <span><span style="color:#38bdf8;">■</span> Target: 1,733 T/day (~52,000 T/month)</span>
+            <span><span style="color:#f43f5e;">■</span> AI Forecast (46,752 T)</span>
+            <span><span style="color:rgba(56,189,248,0.25);">■</span> 90% Confidence Interval</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-header">
+              <div class="card-title">AI ROOT-CAUSE ATTRIBUTION (XAI)</div>
+              <span class="badge badge-crit">SHORTFALL: -5,248 T</span>
+            </div>
+            <div style="font-size:11px; color:#94a3b8; margin-bottom:12px;">TreeSHAP decomposition of the monthly production shortfall:</div>
+            <div id="shapBarsContainer">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">FORECASTING MODEL COMPARISON MATRIX</div>
+            </div>
+            <table class="data-table" id="forecastMetricsTable">
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>MAE</th>
+                  <th>RMSE</th>
+                  <th>MAPE %</th>
+                  <th>R² Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 6: EQUIPMENT DIGITAL TWIN -->
+    <section id="tab-equipment" class="tab-content">
+      <div class="card-header" style="margin-bottom:14px;">
+        <div>
+          <div class="card-title">MINING FLEET DIGITAL TWIN TELEMETRY</div>
+          <div class="card-subtitle">Live health telemetry, engine temperatures, availability %, and simulated failure injection</div>
+        </div>
+        <span class="badge badge-status" id="fleetSummaryBadge">11 MACHINES: 8 RUNNING &bull; 1 WARNING &bull; 2 MAINTENANCE</span>
+      </div>
+      <div class="fleet-grid" id="fleetCardsContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- TAB 7: WHAT-IF SIMULATOR & OPTIMIZER -->
+    <section id="tab-whatif" class="tab-content">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">OPERATIONAL WHAT-IF SCENARIO CONTROLS</div>
+            <span class="badge badge-sim">REAL-TIME INFERENCE</span>
+          </div>
+          <p style="font-size:12px; color:#94a3b8; margin-bottom:18px;">
+            Modify operational parameters to stress-test the mine digital twin and observe production impacts:
+          </p>
+
+          <div class="slider-group">
+            <div class="slider-header">
+              <span>Monsoon Rainfall Intensity:</span>
+              <span class="slider-val" id="whatifRainVal">182 mm</span>
+            </div>
+            <input type="range" id="whatifRain" min="0" max="250" value="182" oninput="document.getElementById('whatifRainVal').innerText = this.value + ' mm'">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-header">
+              <span>Active Haul Trucks (60T Dumpers):</span>
+              <span class="slider-val" id="whatifTrucksVal">5 / 6 Active</span>
+            </div>
+            <input type="range" id="whatifTrucks" min="3" max="6" value="5" oninput="document.getElementById('whatifTrucksVal').innerText = this.value + ' / 6 Active'">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-header">
+              <span>Excavator Fleet Availability:</span>
+              <span class="slider-val" id="whatifExVal">78% (EX-02 Offline)</span>
+            </div>
+            <input type="range" id="whatifEx" min="40" max="100" value="78" oninput="document.getElementById('whatifExVal').innerText = this.value + '%'">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-header">
+              <span>Blasting Schedule Delay:</span>
+              <span class="slider-val" id="whatifBlastVal">2 Days Delay</span>
+            </div>
+            <input type="range" id="whatifBlast" min="0" max="5" value="2" oninput="document.getElementById('whatifBlastVal').innerText = this.value + ' Days Delay'">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-header">
+              <span>Primary Crusher Uptime:</span>
+              <span class="slider-val" id="whatifCrusherVal">91% Availability</span>
+            </div>
+            <input type="range" id="whatifCrusher" min="50" max="100" value="91" oninput="document.getElementById('whatifCrusherVal').innerText = this.value + '% Availability'">
+          </div>
+
+          <div style="margin-top:20px;">
+            <button class="btn btn-action" style="width:100%; padding:10px; justify-content:center; font-size:13px;" onclick="runWhatIfSimulation()">
+              ⚡ RUN AI WHAT-IF SIMULATION
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-header">
+              <div class="card-title">SIMULATION OUTCOME VS BASELINE</div>
+              <span class="badge badge-crit" id="simOutcomeBadge">CRITICAL IMPACT</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+              <div style="background:#090e17; padding:12px; border-radius:6px; border:1px solid #334155;">
+                <div style="font-size:10px; color:#94a3b8;">TARGET PRODUCTION</div>
+                <div style="font-size:20px; font-weight:800; color:#fff; font-family:var(--font-mono);">52,000 T</div>
+              </div>
+              <div style="background:#090e17; padding:12px; border-radius:6px; border:1px solid #334155;">
+                <div style="font-size:10px; color:#94a3b8;">AI FORECAST OUTPUT</div>
+                <div style="font-size:20px; font-weight:800; color:#fb7185; font-family:var(--font-mono);" id="simForecastVal">46,752 T</div>
+              </div>
+              <div style="background:#090e17; padding:12px; border-radius:6px; border:1px solid #334155;">
+                <div style="font-size:10px; color:#94a3b8;">PRODUCTION GAP</div>
+                <div style="font-size:20px; font-weight:800; color:#f43f5e; font-family:var(--font-mono);" id="simGapVal">-5,248 T</div>
+                <div style="font-size:10px; color:#fb7185;" id="simGapPct">-10.1% of Target</div>
+              </div>
+              <div style="background:#090e17; padding:12px; border-radius:6px; border:1px solid #334155;">
+                <div style="font-size:10px; color:#94a3b8;">SHORTFALL PROBABILITY</div>
+                <div style="font-size:20px; font-weight:800; color:#f59e0b; font-family:var(--font-mono);" id="simRiskVal">82.9%</div>
+                <div style="font-size:10px; color:#fbbf24;">HIGH ALERT</div>
+              </div>
+            </div>
+
+            <div class="card-header" style="padding-top:10px;">
+              <div class="card-title">AI OPTIMIZATION INTERVENTIONS</div>
+              <span class="badge badge-status">+5,300 T RECOVERY</span>
+            </div>
+            <div id="simOptimizationList" style="display:flex; flex-direction:column; gap:8px; font-size:11px;">
+              <!-- Rendered dynamically -->
+            </div>
+            <div style="margin-top:14px;">
+              <button class="btn btn-action" style="width:100%; justify-content:center;" onclick="applyOptimization()">
+                ✅ APPLY AI OPTIMIZATION TO MINE SCHEDULE
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 8: EXECUTIVE & AUDIT LOG -->
+    <section id="tab-executive" class="tab-content">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">EXECUTIVE MANAGEMENT SUMMARY (MOIL BOARD VIEW)</div>
+            <span class="badge badge-sim">ANNUAL OUTLOOK FY26-27</span>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; margin-bottom:16px;">
+            <div style="background:#1e293b; padding:12px; border-radius:6px;">
+              <div style="font-size:10px; color:#94a3b8;">ANNUAL TARGET</div>
+              <div style="font-size:22px; font-weight:800; color:#fff; font-family:var(--font-mono);">6.20 MT</div>
+            </div>
+            <div style="background:#1e293b; padding:12px; border-radius:6px;">
+              <div style="font-size:10px; color:#94a3b8;">UNASSISTED FORECAST</div>
+              <div style="font-size:22px; font-weight:800; color:#fb7185; font-family:var(--font-mono);">5.81 MT</div>
+              <div style="font-size:10px; color:#f43f5e;">Potential Gap: -0.39 MT</div>
+            </div>
+            <div style="background:#1e293b; padding:12px; border-radius:6px;">
+              <div style="font-size:10px; color:#94a3b8;">AI INTERVENTION RECOVERY</div>
+              <div style="font-size:22px; font-weight:800; color:#10b981; font-family:var(--font-mono);">+0.27 MT</div>
+              <div style="font-size:10px; color:#34d399;">69.2% Gap Averted</div>
+            </div>
+            <div style="background:#1e293b; padding:12px; border-radius:6px;">
+              <div style="font-size:10px; color:#94a3b8;">RESIDUAL GAP (AFTER AI)</div>
+              <div style="font-size:22px; font-weight:800; color:#38bdf8; font-family:var(--font-mono);">0.12 MT</div>
+              <div style="font-size:10px; color:#94a3b8;">Within Strategic Buffer</div>
+            </div>
+          </div>
+          <div style="font-size:12px; color:#cbd5e1; line-height:1.6; background:#090e17; padding:12px; border-radius:6px;">
+            <strong>Executive Takeaway:</strong> By coupling Earth Observation precipitation timelines with proactive shovel/dumper dispatch redeployment, MOIL can prevent seasonal monsoon shortfall penalties without capital fleet expenditure.
+          </div>
+
+          <div class="card-header" style="margin-top:20px;">
+            <div class="card-title">REAL DATASET UPLOAD PORTAL</div>
+            <span class="badge badge-status">MODE B READY</span>
+          </div>
+          <p style="font-size:11px; color:#94a3b8; margin-bottom:10px;">Upload internal MOIL production, GIS, or drillhole CSV/Excel files to replace simulation data seamlessly:</p>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <input type="file" id="realDataInput" class="btn" style="flex:1;">
+            <button class="btn btn-action" onclick="uploadRealDataset()">Upload &amp; Validate</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">IMMUTABLE AI DECISION AUDIT LOG</div>
+            <span class="badge badge-sim">HUMAN-IN-THE-LOOP</span>
+          </div>
+          <div style="font-size:11px; color:#94a3b8; margin-bottom:12px;">Statutory traceability for all algorithmic recommendations and mine planner authorizations:</div>
+          <div id="auditLogList" style="display:flex; flex-direction:column; gap:10px; max-height:420px; overflow-y:auto;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- JUDGE MODE MODAL (9-Step SIH 2026 Presentation Storyline) -->
+  <div id="judgeModal">
+    <div class="judge-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <span class="judge-step-badge" id="judgeStepBadge">STEP 1 OF 9 &bull; EARTH OBSERVATION</span>
+        <button class="btn" onclick="closeJudgeMode()">✕ Close</button>
+      </div>
+      <div class="judge-title" id="judgeTitle">AI Scans Geological &amp; Satellite Data</div>
+      <div class="judge-desc" id="judgeDesc">Multi-spectral satellite bands and Sausar Group structural density maps are analyzed across 15x15 km exploration perimeter.</div>
+      
+      <div class="judge-metrics-row" id="judgeMetricsRow">
+        <div class="judge-metric-box">
+          <div style="font-size:11px; color:#94a3b8;" id="judgeM1Label">Raster Grid Cells</div>
+          <div class="judge-metric-num" id="judgeM1Val">400 Cells</div>
+        </div>
+        <div class="judge-metric-box">
+          <div style="font-size:11px; color:#94a3b8;" id="judgeM2Label">Exploration Zones</div>
+          <div class="judge-metric-num" id="judgeM2Val">6 Zones</div>
+        </div>
+        <div class="judge-metric-box">
+          <div style="font-size:11px; color:#94a3b8;" id="judgeM3Label">Model ROC-AUC</div>
+          <div class="judge-metric-num" id="judgeM3Val">0.977</div>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <button class="btn" id="judgePrevBtn" onclick="prevJudgeStep()">← Previous Step</button>
+        <div style="display:flex; gap:6px;" id="judgeStepDots">
+          <!-- Rendered dynamically -->
+        </div>
+        <button class="btn btn-judge" id="judgeNextBtn" onclick="nextJudgeStep()">Next Step →</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Application State ---
+    let appData = {
+      dashboard: null,
+      prospectivity: null,
+      forecast: null,
+      fleet: null,
+      selectedZoneId: "ZONE_A",
+      judgeStep: 1
+    };
+
+    // --- Tab Switching ---
+    function switchTab(tabKey) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      const targetBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabKey));
+      if (targetBtn) targetBtn.classList.add('active');
+      
+      const targetContent = document.getElementById('tab-' + tabKey);
+      if (targetContent) targetContent.classList.add('active');
+
+      if (tabKey === 'prospectivity') renderGisMap();
+      if (tabKey === 'subsurface') render3DBlockModel();
+      if (tabKey === 'forecast') renderForecastChart();
+    }
+
+    // --- API Fetchers ---
+    async function loadDashboardSummary() {
+      try {
+        const res = await fetch('/api/dashboard');
+        const data = await res.json();
+        appData.dashboard = data;
+        
+        document.getElementById('kpiProspectivity').innerText = data.kpis.ai_prospectivity_score + '%';
+        document.getElementById('kpiResource').innerText = data.kpis.estimated_exploration_target_mt + ' MT';
+        document.getElementById('kpiTodayProd').innerText = Number(data.kpis.todays_actual_production_tonnes).toLocaleString() + ' T';
+        document.getElementById('kpiShortfallRisk').innerText = data.kpis.shortfall_risk_pct + '%';
+        document.getElementById('kpiGap').innerText = Number(data.kpis.production_gap_tonnes).toLocaleString() + ' T (' + data.kpis.risk_level + ')';
+        document.getElementById('kpiFleetAvail').innerText = data.kpis.fleet_availability_pct + '%';
+        document.getElementById('kpiWeatherRisk').innerText = data.kpis.weather_risk;
+        
+        if (data.missing_data_fallback_active) {
+          document.getElementById('telemetryBadge').className = 'badge badge-warn';
+          document.getElementById('telemetryBadge').innerHTML = '<span class="pulse-dot"></span>FALLBACK ACTIVE: 61% CONF';
+          document.getElementById('fallbackToggleBtn').innerText = 'Restore Telemetry';
+        } else {
+          document.getElementById('telemetryBadge').className = 'badge badge-status';
+          document.getElementById('telemetryBadge').innerHTML = '<span class="pulse-dot"></span>GIS &amp; FLEET TELEMETRY: SYNCED';
+          document.getElementById('fallbackToggleBtn').innerText = '⚠ Fallback Mode';
+        }
+      } catch (err) {
+        console.error('Failed to load dashboard:', err);
+      }
+    }
+
+    async function loadProspectivityData(model = 'XGBoost') {
+      try {
+        const res = await fetch('/api/prospectivity?model=' + encodeURIComponent(model));
+        const data = await res.json();
+        appData.prospectivity = data;
+        
+        // Render Feature Importances
+        const featContainer = document.getElementById('featureImportanceList');
+        featContainer.innerHTML = '';
+        const importances = data.model_performance.feature_importances;
+        for (const [feat, pct] of Object.entries(importances)) {
+          const cleanName = feat.replace(/_/g, ' ').toUpperCase();
+          featContainer.innerHTML += `
+            <div class="shap-item">
+              <div class="shap-meta">
+                <span>${cleanName}</span>
+                <strong style="color:#38bdf8; font-family:var(--font-mono);">${pct}%</strong>
+              </div>
+              <div class="shap-bar-bg">
+                <div class="shap-bar-fill" style="width:${pct}%; background:#38bdf8;"></div>
+              </div>
+            </div>
+          `;
+        }
+
+        renderGisMap();
+        selectZone(data.zones[0]);
+      } catch (err) {
+        console.error('Failed to load prospectivity:', err);
+      }
+    }
+
+    async function loadForecastData(model = 'XGBoost Regressor') {
+      try {
+        const res = await fetch('/api/production/forecast?model=' + encodeURIComponent(model));
+        const data = await res.json();
+        appData.forecast = data;
+
+        // Render Comparison Table
+        const tbody = document.querySelector('#forecastMetricsTable tbody');
+        tbody.innerHTML = '';
+        for (const [mName, mData] of Object.entries(data.all_models_metrics)) {
+          const isBest = mData.best_model;
+          tbody.innerHTML += `
+            <tr style="${isBest ? 'background:rgba(56,189,248,0.1); font-weight:700;' : ''}">
+              <td>${mName} ${isBest ? '<span class="badge badge-status" style="font-size:9px; padding:1px 4px;">BEST</span>' : ''}</td>
+              <td style="font-family:var(--font-mono);">${mData.mae}</td>
+              <td style="font-family:var(--font-mono);">${mData.rmse}</td>
+              <td style="font-family:var(--font-mono);">${mData.mape_pct}%</td>
+              <td style="font-family:var(--font-mono); color:${isBest ? '#38bdf8' : '#cbd5e1'};">${mData.r2_score}</td>
+            </tr>
+          `;
+        }
+
+        renderForecastChart();
+        loadRootCauses();
+      } catch (err) {
+        console.error('Failed to load forecast:', err);
+      }
+    }
+
+    async function loadRootCauses() {
+      // Default causes
+      const causes = [
+        { category: "Equipment Downtime (EX-02 / HT-05)", pct: 38.0, color: "#f43f5e", detail: "EX-02 maintenance reduced digging volume by 22%" },
+        { category: "Monsoon Precipitation (182 mm)", pct: 24.0, color: "#f59e0b", detail: "Haul road friction slowed dumper cycle times" },
+        { category: "Blasting Schedule Delay", pct: 19.0, color: "#eab308", detail: "Blast B-17 delayed by 12 hours" },
+        { category: "Crusher Feed Bridging", pct: 12.0, color: "#06b6d4", detail: "Sticky wet clay restricted primary jaw throughput" },
+        { category: "Haulage Bypass Detour", pct: 7.0, color: "#8b5cf6", detail: "South detour added 0.8 km per truck round trip" }
+      ];
+
+      const cont = document.getElementById('shapBarsContainer');
+      cont.innerHTML = '';
+      causes.forEach(c => {
+        cont.innerHTML += `
+          <div class="shap-item">
+            <div class="shap-meta">
+              <span>${c.category}</span>
+              <strong style="color:${c.color}; font-family:var(--font-mono);">${c.pct}%</strong>
+            </div>
+            <div class="shap-bar-bg">
+              <div class="shap-bar-fill" style="width:${c.pct}%; background:${c.color};"></div>
+            </div>
+            <div style="font-size:10px; color:#64748b; margin-top:2px;">${c.detail}</div>
+          </div>
+        `;
+      });
+    }
+
+    async function loadFleetData() {
+      try {
+        const res = await fetch('/api/equipment/fleet');
+        const data = await res.json();
+        appData.fleet = data;
+
+        const cont = document.getElementById('fleetCardsContainer');
+        cont.innerHTML = '';
+        data.fleet_nodes.forEach(m => {
+          let badgeClass = 'badge-status';
+          if (m.status === 'WARNING') badgeClass = 'badge-warn';
+          if (m.status === 'MAINTENANCE') badgeClass = 'badge-sim';
+          if (m.status === 'BREAKDOWN') badgeClass = 'badge-crit';
+
+          cont.innerHTML += `
+            <div class="fleet-card">
+              <div class="fleet-top">
+                <span class="fleet-id">${m.id}</span>
+                <span class="badge ${badgeClass}" style="font-size:9px;">${m.status}</span>
+              </div>
+              <div style="font-size:11px; font-weight:600; color:#fff; margin-bottom:6px;">${m.type}</div>
+              <div style="font-size:10px; color:#94a3b8; display:flex; justify-content:space-between; margin-bottom:3px;">
+                <span>Availability:</span>
+                <strong style="color:#38bdf8;">${m.availability_pct}%</strong>
+              </div>
+              <div style="font-size:10px; color:#94a3b8; display:flex; justify-content:space-between; margin-bottom:3px;">
+                <span>Engine Temp:</span>
+                <strong style="color:${m.engine_temp_c > 95 ? '#fb7185' : '#10b981'};">${m.engine_temp_c}°C</strong>
+              </div>
+              <div style="font-size:10px; color:#94a3b8; display:flex; justify-content:space-between; margin-bottom:8px;">
+                <span>Current Zone:</span>
+                <span>${m.zone}</span>
+              </div>
+              <div style="display:flex; gap:6px;">
+                <button class="btn" style="padding:3px 6px; font-size:10px; flex:1; justify-content:center;" onclick="toggleMachineStatus('${m.id}', '${m.status === 'RUNNING' ? 'BREAKDOWN' : 'RUNNING'}')">
+                  ${m.status === 'RUNNING' ? 'Simulate Fault' : 'Restore'}
+                </button>
+              </div>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error('Failed to load fleet:', err);
+      }
+    }
+
+    async function toggleMachineStatus(machineId, newStatus) {
+      try {
+        await fetch('/api/equipment/toggle-status', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ equipment_id: machineId, target_status: newStatus })
+        });
+        await loadFleetData();
+        await loadDashboardSummary();
+      } catch (err) {
+        console.error('Failed to toggle machine:', err);
+      }
+    }
+
+    async function runWhatIfSimulation() {
+      const rain = parseFloat(document.getElementById('whatifRain').value);
+      const trucks = parseInt(document.getElementById('whatifTrucks').value);
+      const ex = parseFloat(document.getElementById('whatifEx').value) / 100.0;
+      const blast = parseInt(document.getElementById('whatifBlast').value);
+      const crusher = parseFloat(document.getElementById('whatifCrusher').value) / 100.0;
+
+      try {
+        const res = await fetch('/api/simulation/what-if', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            rainfall_mm: rain,
+            active_haul_trucks: trucks,
+            excavator_avg_avail: ex,
+            blast_delay_days: blast,
+            crusher_avail_pct: crusher,
+            model_name: "XGBoost Regressor"
+          })
+        });
+        const data = await res.json();
+        
+        document.getElementById('simForecastVal').innerText = Number(data.scenario_forecast_tonnes).toLocaleString() + ' T';
+        document.getElementById('simGapVal').innerText = Number(data.production_gap_tonnes).toLocaleString() + ' T';
+        document.getElementById('simGapPct').innerText = data.percentage_impact + '% of Target';
+        document.getElementById('simRiskVal').innerText = data.shortfall_risk_pct + '%';
+        
+        if (data.shortfall_risk_pct > 75) {
+          document.getElementById('simOutcomeBadge').className = 'badge badge-crit';
+          document.getElementById('simOutcomeBadge').innerText = 'CRITICAL SHORTFALL';
+        } else if (data.shortfall_risk_pct > 40) {
+          document.getElementById('simOutcomeBadge').className = 'badge badge-warn';
+          document.getElementById('simOutcomeBadge').innerText = 'MODERATE GAP';
+        } else {
+          document.getElementById('simOutcomeBadge').className = 'badge badge-status';
+          document.getElementById('simOutcomeBadge').innerText = 'TARGET ON TRACK';
+        }
+
+        // Render Optimization Levers
+        const list = document.getElementById('simOptimizationList');
+        list.innerHTML = '';
+        data.ai_optimization_plan.recommendations.forEach(r => {
+          list.innerHTML += `
+            <div style="background:#1e293b; padding:8px 10px; border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong style="color:#fff;">${r.action}</strong>
+                <div style="font-size:9px; color:#94a3b8;">${r.rationale}</div>
+              </div>
+              <span style="color:#34d399; font-weight:700; font-family:var(--font-mono);">+${r.expected_recovery_tonnes} T</span>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error('What-if simulation error:', err);
+      }
+    }
+
+    async function applyOptimization() {
+      try {
+        const res = await fetch('/api/simulation/optimize', { method: 'POST' });
+        const data = await res.json();
+        alert('SUCCESS: AI Optimization Applied!\nRevised Shortfall Risk: ' + data.revised_shortfall_risk_pct + '%\nRevised Forecast: ' + Number(data.revised_forecast_tonnes).toLocaleString() + ' Tonnes');
+        await loadDashboardSummary();
+        await loadAuditLogs();
+        switchTab('cmd');
+      } catch (err) {
+        console.error('Optimization error:', err);
+      }
+    }
+
+    async function loadAuditLogs() {
+      try {
+        const res = await fetch('/api/audit/logs');
+        const data = await res.json();
+        const cont = document.getElementById('auditLogList');
+        cont.innerHTML = '';
+        data.logs.forEach(l => {
+          cont.innerHTML += `
+            <div style="background:#090e17; padding:12px; border-radius:6px; border:1px solid #334155; font-size:11px;">
+              <div style="display:flex; justify-content:space-between; font-weight:700; color:#38bdf8; margin-bottom:4px;">
+                <span>${l.id} &bull; ${l.timestamp}</span>
+                <span class="badge ${l.human_approved ? 'badge-status' : 'badge-warn'}" style="font-size:9px;">
+                  ${l.human_approved ? 'APPROVED' : 'PENDING APPROVAL'}
+                </span>
+              </div>
+              <div style="color:#fff; font-weight:600;">${l.recommended_action} (${l.expected_recovery})</div>
+              <div style="color:#94a3b8; font-size:10px; margin-top:2px;">Model: ${l.model_version} &bull; Prediction: ${l.prediction}</div>
+              <div style="color:#64748b; font-size:10px; margin-top:2px;">Sign-off: ${l.approved_by}</div>
+              ${!l.human_approved ? `<button class="btn btn-action" style="margin-top:8px; padding:4px 8px; font-size:10px;" onclick="approveLog('${l.id}')">Sign Off &amp; Authorize</button>` : ''}
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error('Failed to load audit logs:', err);
+      }
+    }
+
+    async function approveLog(logId) {
+      try {
+        await fetch('/api/audit/approve', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ log_id: logId, approved_by: 'Shift In-Charge (Logged)' })
+        });
+        await loadAuditLogs();
+      } catch (err) {
+        console.error('Approval failed:', err);
+      }
+    }
+
+    async function toggleFallback() {
+      try {
+        const res = await fetch('/api/fallback/toggle');
+        const data = await res.json();
+        alert('Fallback Mode: ' + (data.missing_data_fallback_active ? 'ENABLED (Historical Model Active, Confidence 61%)' : 'DISABLED (Telemetry Restored)'));
+        await loadDashboardSummary();
+      } catch (err) {
+        console.error('Fallback toggle failed:', err);
+      }
+    }
+
+    async function uploadRealDataset() {
+      const fileInput = document.getElementById('realDataInput');
+      if (!fileInput.files.length) {
+        alert('Please choose a CSV or GeoJSON dataset to upload.');
+        return;
+      }
+      const file = fileInput.files[0];
+      const text = await file.text();
+
+      try {
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            dataset_type: 'production',
+            filename: file.name,
+            file_content_text: text
+          })
+        });
+        const data = await res.json();
+        alert('DATASET ACCEPTED: ' + data.badge_status + '\nValidation: ' + data.validation_status);
+        await loadDashboardSummary();
+      } catch (err) {
+        console.error('Upload error:', err);
+      }
+    }
+
+    // --- Interactive 2D GIS Map Rendering (Canvas) ---
+    function renderGisMap() {
+      const canvas = document.getElementById('gisCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.parentElement.clientWidth;
+      const h = canvas.parentElement.clientHeight;
+      canvas.width = w;
+      canvas.height = h;
+
+      // Dark topographical base
+      ctx.fillStyle = "#070b13";
+      ctx.fillRect(0, 0, w, h);
+
+      // Draw grid raster cells
+      const cols = 20, rows = 20;
+      const cw = w / cols, rh = h / rows;
+      
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          // Distance to centers
+          const d1 = Math.hypot(c - 6, r - 5);
+          const d2 = Math.hypot(c - 14, r - 12);
+          const score = Math.max(0, 1.0 - Math.min(d1, d2) / 8.0);
+          
+          if (score > 0.75) ctx.fillStyle = "rgba(244, 63, 94, 0.45)"; // Very High
+          else if (score > 0.50) ctx.fillStyle = "rgba(245, 158, 11, 0.35)"; // High
+          else if (score > 0.30) ctx.fillStyle = "rgba(234, 179, 8, 0.25)"; // Medium
+          else ctx.fillStyle = "rgba(2, 132, 199, 0.12)"; // Low
+
+          ctx.fillRect(c * cw, r * rh, cw - 1, rh - 1);
+        }
+      }
+
+      // Draw Fault Lines / Lineaments
+      ctx.strokeStyle = "rgba(244, 63, 94, 0.6)";
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 4]);
+      ctx.beginPath();
+      ctx.moveTo(w * 0.15, h * 0.1);
+      ctx.lineTo(w * 0.85, h * 0.9);
+      ctx.stroke();
+
+      ctx.strokeStyle = "rgba(251, 191, 36, 0.5)";
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(w * 0.3, h * 0.05);
+      ctx.lineTo(w * 0.65, h * 0.95);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Draw Exploration Zones
+      if (appData.prospectivity && appData.prospectivity.zones) {
+        appData.prospectivity.zones.forEach((z, idx) => {
+          const zx = w * (0.2 + (idx % 3) * 0.3);
+          const zy = h * (0.25 + Math.floor(idx / 3) * 0.45);
+
+          ctx.beginPath();
+          ctx.arc(zx, zy, 24, 0, Math.PI * 2);
+          ctx.fillStyle = z.ai_priority === 'VERY HIGH' ? "rgba(244, 63, 94, 0.6)" : "rgba(245, 158, 11, 0.5)";
+          ctx.fill();
+          ctx.strokeStyle = "#fff";
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          ctx.fillStyle = "#fff";
+          ctx.font = "bold 10px sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(z.id.replace('_', ' '), zx, zy - 4);
+          ctx.font = "9px monospace";
+          ctx.fillText(z.ai_prospectivity_score + '%', zx, zy + 8);
+        });
+      }
+
+      // Click listener
+      canvas.onclick = (evt) => {
+        const rect = canvas.getBoundingClientRect();
+        const clickX = evt.clientX - rect.left;
+        const clickY = evt.clientY - rect.top;
+
+        if (appData.prospectivity && appData.prospectivity.zones) {
+          appData.prospectivity.zones.forEach((z, idx) => {
+            const zx = w * (0.2 + (idx % 3) * 0.3);
+            const zy = h * (0.25 + Math.floor(idx / 3) * 0.45);
+            if (Math.hypot(clickX - zx, clickY - zy) < 30) {
+              selectZone(z);
+            }
+          });
+        }
+      };
+    }
+
+    function selectZone(zone) {
+      appData.selectedZoneId = zone.id;
+      document.getElementById('zoneCardName').innerText = zone.name;
+      document.getElementById('zoneCardPriority').innerText = zone.ai_priority;
+      document.getElementById('zoneCardScore').innerText = zone.ai_prospectivity_score + '%';
+      document.getElementById('zoneCardConfidence').innerText = zone.ai_confidence_score + '%';
+      document.getElementById('zoneCardRec').innerText = zone.ai_recommendation;
+
+      if (zone.ai_priority === 'VERY HIGH') {
+        document.getElementById('zoneCardPriority').className = 'badge badge-crit';
+      } else if (zone.ai_priority === 'HIGH') {
+        document.getElementById('zoneCardPriority').className = 'badge badge-warn';
+      } else {
+        document.getElementById('zoneCardPriority').className = 'badge badge-sim';
+      }
+    }
+
+    async function simulateDrillOnSelectedZone() {
+      try {
+        const res = await fetch('/api/prospectivity/simulate-drill', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ zone_id: appData.selectedZoneId, target_depth_m: 80.0 })
+        });
+        const data = await res.json();
+        
+        document.getElementById('drillResultCard').style.display = 'block';
+        document.getElementById('drillHoleId').innerText = data.drill_id;
+
+        const cont = document.getElementById('drillIntervalsList');
+        cont.innerHTML = `
+          <div style="background:#1e293b; padding:8px; border-radius:4px; margin-bottom:4px;">
+            <div style="color:#38bdf8; font-weight:700;">Ore Interval: ${data.potential_mn_bearing_interval_m}m &bull; Avg Grade: ${data.estimated_average_grade_pct}% Mn</div>
+            <div style="color:#94a3b8; font-size:10px;">Confidence: ${data.geological_confidence_pct}% &bull; ${data.zone_name}</div>
+          </div>
+        `;
+        data.intervals.forEach(it => {
+          cont.innerHTML += `
+            <div style="display:flex; justify-content:space-between; padding:4px 6px; border-bottom:1px solid #334155; color:${it.is_ore ? '#ec4899' : '#94a3b8'};">
+              <span>Depth ${it.from_m}–${it.to_m}m: <strong>${it.lithology}</strong></span>
+              <span style="font-family:var(--font-mono);">${it.grade_pct}% Mn</span>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error('Drill simulation error:', err);
+      }
+    }
+
+    // --- Interactive 3D Subsurface Block Model Rendering (Isometric Canvas) ---
+    let blockFilterDepth = 0;
+    function render3DBlockModel() {
+      const canvas = document.getElementById('threeCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.parentElement.clientWidth;
+      const h = canvas.parentElement.clientHeight;
+      canvas.width = w;
+      canvas.height = h;
+
+      ctx.fillStyle = "#040711";
+      ctx.fillRect(0, 0, w, h);
+
+      // Isometric block grid
+      const originX = w * 0.5;
+      const originY = h * 0.28;
+      const blockW = 20, blockH = 10, blockD = 12;
+
+      const nx = 9, ny = 9, nz = 5;
+      for (let z = 0; z < nz; z++) {
+        const depthM = z * 18;
+        if (blockFilterDepth > 0 && depthM > blockFilterDepth) continue;
+
+        for (let y = 0; y < ny; y++) {
+          for (let x = 0; x < nx; x++) {
+            // Isometric projection
+            const isoX = originX + (x - y) * blockW;
+            const isoY = originY + (x + y) * blockH + (z * blockD);
+
+            // Stratigraphy color
+            let col = "#475569"; // Waste
+            if (z === 0) col = "#92400e"; // Laterite
+            else if (z >= 1 && z <= 3 && Math.hypot(x - 4, y - 4) < 3.2) {
+              col = (x + y) % 2 === 0 ? "#ec4899" : "#8b5cf6"; // Manganiferous ore
+            }
+
+            // Draw Isometric Cube
+            ctx.fillStyle = col;
+            ctx.beginPath();
+            ctx.moveTo(isoX, isoY);
+            ctx.lineTo(isoX + blockW, isoY + blockH);
+            ctx.lineTo(isoX, isoY + blockH * 2);
+            ctx.lineTo(isoX - blockW, isoY + blockH);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = "rgba(0,0,0,0.3)";
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw Drill Borehole Cylinders
+      ctx.strokeStyle = "#38bdf8";
+      ctx.lineWidth = 2.5;
+      for (let d = 0; d < 5; d++) {
+        const bx = originX + (d * 3 - 6) * blockW;
+        const by = originY + (d * 2) * blockH;
+        ctx.beginPath();
+        ctx.moveTo(bx, by);
+        ctx.lineTo(bx, by + 85);
+        ctx.stroke();
+
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.arc(bx, by, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function onDepthFilterChange(val) {
+      blockFilterDepth = parseInt(val);
+      document.getElementById('depthValText').innerText = val === '0' ? 'All Depths (0-90m)' : 'Filtered to ≤ ' + val + 'm Depth';
+      render3DBlockModel();
+    }
+
+    // --- 30-Day Production Forecast Canvas Chart ---
+    function renderForecastChart() {
+      const canvas = document.getElementById('forecastCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.parentElement.clientWidth;
+      const h = canvas.parentElement.clientHeight;
+      canvas.width = w;
+      canvas.height = h;
+
+      ctx.fillStyle = "#090e17";
+      ctx.fillRect(0, 0, w, h);
+
+      if (!appData.forecast || !appData.forecast.daily_forecast) return;
+      const days = appData.forecast.daily_forecast;
+
+      const padX = 45, padY = 25;
+      const plotW = w - padX * 2;
+      const plotH = h - padY * 2;
+
+      const minVal = 800, maxVal = 2400;
+      const getY = (val) => padY + plotH - ((val - minVal) / (maxVal - minVal)) * plotH;
+      const getX = (idx) => padX + (idx / (days.length - 1)) * plotW;
+
+      // Draw Target Line (1,733 T)
+      const targetY = getY(1733.3);
+      ctx.strokeStyle = "#38bdf8";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(padX, targetY);
+      ctx.lineTo(padX + plotW, targetY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = "#38bdf8";
+      ctx.font = "10px monospace";
+      ctx.fillText("TARGET: 1,733 T/DAY", padX + 6, targetY - 6);
+
+      // Draw 90% Confidence Envelope
+      ctx.fillStyle = "rgba(56, 189, 248, 0.12)";
+      ctx.beginPath();
+      ctx.moveTo(getX(0), getY(days[0].ci_upper_tonnes));
+      for (let i = 1; i < days.length; i++) ctx.lineTo(getX(i), getY(days[i].ci_upper_tonnes));
+      for (let i = days.length - 1; i >= 0; i--) ctx.lineTo(getX(i), getY(days[i].ci_lower_tonnes));
+      ctx.closePath();
+      ctx.fill();
+
+      // Draw Forecast Line
+      ctx.strokeStyle = "#f43f5e";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(getX(0), getY(days[0].forecast_tonnes));
+      for (let i = 1; i < days.length; i++) {
+        ctx.lineTo(getX(i), getY(days[i].forecast_tonnes));
+      }
+      ctx.stroke();
+
+      // Axis labels
+      ctx.fillStyle = "#64748b";
+      ctx.font = "9px monospace";
+      ctx.fillText("DAY 1", padX, h - 8);
+      ctx.fillText("DAY 15", padX + plotW / 2 - 15, h - 8);
+      ctx.fillText("DAY 30", padX + plotW - 35, h - 8);
+    }
+
+    function onTimelineRainChange(val) {
+      document.getElementById('timelineRainVal').innerText = val + ' mm';
+      document.getElementById('spaceRain').innerText = val + ' mm';
+      const moist = Math.min(0.85, 0.15 + val / 250.0).toFixed(2);
+      document.getElementById('spaceMoist').innerText = moist;
+
+      if (val > 120) {
+        document.getElementById('spaceHaulStatus').innerText = 'Rolling Resistance +34% (Max 15 km/h)';
+        document.getElementById('spaceBlastStatus').innerText = 'Wet Blast-Hole Delay Recommended';
+        document.getElementById('spaceCrusherStatus').innerText = 'Chute Bridging Alert (High)';
+      } else if (val > 40) {
+        document.getElementById('spaceHaulStatus').innerText = 'Moderate Slip (Max 22 km/h)';
+        document.getElementById('spaceBlastStatus').innerText = 'Inspect Pit Water Buffer';
+        document.getElementById('spaceCrusherStatus').innerText = 'Standard Operating Window';
+      } else {
+        document.getElementById('spaceHaulStatus').innerText = 'Optimal Dry Rolling Conditions';
+        document.getElementById('spaceBlastStatus').innerText = 'Clear For Controlled Blast';
+        document.getElementById('spaceCrusherStatus').innerText = 'Optimal Dry Feed Flow';
+      }
+    }
+
+    // --- JUDGE MODE (9-Step Hackathon Presentation Storyline) ---
+    const judgeStories = [
+      {
+        step: 1,
+        title: "AI Scans Geological & Satellite Layers",
+        desc: "High-resolution Sentinel-2 spectral alteration indices, Landsat LST, and Sausar Group structural lineaments are synthesized across a 15x15 km exploration perimeter.",
+        m1: ["Grid Cells", "400 Cells"],
+        m2: ["Exploration Belts", "Balaghat-Ukwa"],
+        m3: ["Sensor Data", "Multi-spectral"]
+      },
+      {
+        step: 2,
+        title: "High-Prospectivity Exploration Targets Identified",
+        desc: "The Machine Learning engine classifies Zone A (North Balaghat) and Zone D (Dongri Buzurg East) as VERY HIGH priority with >89% confidence, identifying new target mineral horizons.",
+        m1: ["Zone A Score", "91.8%"],
+        m2: ["Zone D Score", "89.4%"],
+        m3: ["Est. Resource", "2.84 MT"]
+      },
+      {
+        step: 3,
+        title: "Production Forecast Evaluated (Next 30 Days)",
+        desc: "AI evaluates time-series production against the monthly 52,000 Tonne MOIL target. Historical mining patterns are compared across SARIMA, Random Forest, and XGBoost.",
+        m1: ["Monthly Target", "52,000 T"],
+        m2: ["Daily Baseline", "1,733 T/day"],
+        m3: ["Best Model", "XGBoost (R² 0.58)"]
+      },
+      {
+        step: 4,
+        title: "Monsoon Rainfall + Excavator Downtime Triggers Alert",
+        desc: "A simulated 182 mm monsoon event combined with EX-02 breakdown reduces shovel capacity and causes haul road slipperiness, creating an 82.9% shortfall risk.",
+        m1: ["Rainfall", "182 mm"],
+        m2: ["Forecast Gap", "-5,248 T"],
+        m3: ["Shortfall Risk", "82.9% (CRITICAL)"]
+      },
+      {
+        step: 5,
+        title: "AI Identifies Dominant Root Causes (XAI)",
+        desc: "Explainable AI (TreeSHAP) isolates primary contributors: Equipment downtime (38%), Rainfall haul inefficiency (24%), and Blasting delays (19%).",
+        m1: ["Equipment Loss", "38% (1,994 T)"],
+        m2: ["Weather Impact", "24% (1,259 T)"],
+        m3: ["Blast Delay", "19% (997 T)"]
+      },
+      {
+        step: 6,
+        title: "Digital Twin Tests Operational Interventions",
+        desc: "The simulator evaluates what-if adjustments across the fleet to balance excavator cycle times, crusher throughput, and muckpile availability without additional capital expenditure.",
+        m1: ["Scenarios Tested", "14 Presets"],
+        m2: ["Fleet Simulated", "11 Machines"],
+        m3: ["Constraint Solver", "OR Optimizer"]
+      },
+      {
+        step: 7,
+        title: "AI Recommends 4 Quantified Interventions",
+        desc: "The engine produces an exact recovery schedule: 1) Redeploy HT-04 (+2,100 T), 2) Reschedule Blast B-17 (+1,400 T), 3) Expedite EX-02 PM (+1,000 T), 4) Extend Crusher Window (+800 T).",
+        m1: ["Actions", "4 Interventions"],
+        m2: ["Fleet Relocations", "1 Truck (HT-04)"],
+        m3: ["Schedule Shift", "+24h Blast Lead"]
+      },
+      {
+        step: 8,
+        title: "Simulation Proves Production Recovery",
+        desc: "With recommendations applied, the digital twin recovers +5,300 tonnes of manganese ore, neutralizing the gap and lowering shortfall risk from 82.9% to 14.5%.",
+        m1: ["Recovered Ore", "+5,300 T"],
+        m2: ["Revised Output", "52,052 T"],
+        m3: ["Revised Risk", "14.5% (LOW)"]
+      },
+      {
+        step: 9,
+        title: "Mine Planner Authorizes Final Audit Decision",
+        desc: "The human-in-the-loop workflow logs the immutable decision with timestamp, model version, and Chief Mine Planner sign-off into the statutory audit log.",
+        m1: ["Audit ID", "DEC-2026-0911"],
+        m2: ["Human Approval", "VERIFIED"],
+        m3: ["Decision Status", "DISPATCH ACTIVE"]
+      }
+    ];
+
+    function openJudgeMode() {
+      document.getElementById('judgeModal').style.display = 'flex';
+      appData.judgeStep = 1;
+      updateJudgeUI();
+    }
+
+    function closeJudgeMode() {
+      document.getElementById('judgeModal').style.display = 'none';
+    }
+
+    function updateJudgeUI() {
+      const s = judgeStories[appData.judgeStep - 1];
+      document.getElementById('judgeStepBadge').innerText = `STEP ${s.step} OF 9 • SIH 2026 PRESENTATION`;
+      document.getElementById('judgeTitle').innerText = s.title;
+      document.getElementById('judgeDesc').innerText = s.desc;
+
+      document.getElementById('judgeM1Label').innerText = s.m1[0];
+      document.getElementById('judgeM1Val').innerText = s.m1[1];
+      document.getElementById('judgeM2Label').innerText = s.m2[0];
+      document.getElementById('judgeM2Val').innerText = s.m2[1];
+      document.getElementById('judgeM3Label').innerText = s.m3[0];
+      document.getElementById('judgeM3Val').innerText = s.m3[1];
+
+      document.getElementById('judgePrevBtn').style.visibility = appData.judgeStep === 1 ? 'hidden' : 'visible';
+      document.getElementById('judgeNextBtn').innerText = appData.judgeStep === 9 ? 'Finish Demo' : 'Next Step →';
+
+      // Update dots
+      const dotsCont = document.getElementById('judgeStepDots');
+      dotsCont.innerHTML = '';
+      for (let i = 1; i <= 9; i++) {
+        dotsCont.innerHTML += `
+          <div style="width:8px; height:8px; border-radius:50%; background:${i === appData.judgeStep ? '#f59e0b' : '#334155'};"></div>
+        `;
+      }
+
+      // Auto-switch tabs to demonstrate visual story
+      if (s.step === 1 || s.step === 2) switchTab('prospectivity');
+      if (s.step === 3 || s.step === 4 || s.step === 5) switchTab('forecast');
+      if (s.step === 6 || s.step === 7 || s.step === 8) switchTab('whatif');
+      if (s.step === 9) switchTab('executive');
+    }
+
+    function nextJudgeStep() {
+      if (appData.judgeStep < 9) {
+        appData.judgeStep++;
+        updateJudgeUI();
+      } else {
+        closeJudgeMode();
+        switchTab('cmd');
+      }
+    }
+
+    function prevJudgeStep() {
+      if (appData.judgeStep > 1) {
+        appData.judgeStep--;
+        updateJudgeUI();
+      }
+    }
+
+    // --- Initialization ---
+    window.addEventListener('DOMContentLoaded', async () => {
+      await loadDashboardSummary();
+      await loadProspectivityData();
+      await loadForecastData();
+      await loadFleetData();
+      await loadAuditLogs();
+      renderGisMap();
+    });
+
+    window.addEventListener('resize', () => {
+      renderGisMap();
+      renderForecastChart();
+    });
+  </script>
+</body>
+</html>

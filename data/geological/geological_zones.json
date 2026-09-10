@@ -1,0 +1,140 @@
+[
+  {
+    "id": "ZONE_A",
+    "name": "Zone A - North Balaghat Extension",
+    "center": [
+      21.882,
+      79.835
+    ],
+    "area_sq_km": 4.8,
+    "lithology": "Mansar Schist / Gondite Formation",
+    "structural_density": 0.88,
+    "lineament_density": 0.84,
+    "spectral_alteration_index": 0.82,
+    "distance_to_known_deposit_km": 1.2,
+    "elevation_m": 412.0,
+    "slope_deg": 14.5,
+    "drainage_density": 0.65,
+    "terrain_ruggedness": 0.58,
+    "historical_prospect_points": 14,
+    "known_manganese_occurrences": true,
+    "true_prospectivity_prob": 0.92,
+    "prospectivity_tier": "VERY HIGH",
+    "recommended_action": "Prioritize geological verification / intensive core drilling."
+  },
+  {
+    "id": "ZONE_B",
+    "name": "Zone B - South Ukwa Limb",
+    "center": [
+      21.845,
+      79.862
+    ],
+    "area_sq_km": 6.2,
+    "lithology": "Quartz-Muscovite Schist with Gondite bands",
+    "structural_density": 0.68,
+    "lineament_density": 0.71,
+    "spectral_alteration_index": 0.64,
+    "distance_to_known_deposit_km": 3.4,
+    "elevation_m": 385.0,
+    "slope_deg": 11.2,
+    "drainage_density": 0.52,
+    "terrain_ruggedness": 0.44,
+    "historical_prospect_points": 8,
+    "known_manganese_occurrences": true,
+    "true_prospectivity_prob": 0.68,
+    "prospectivity_tier": "MEDIUM",
+    "recommended_action": "Conduct infill geophysical resistivity and trench sampling."
+  },
+  {
+    "id": "ZONE_C",
+    "name": "Zone C - Tirodi Gneissic Border",
+    "center": [
+      21.81,
+      79.79
+    ],
+    "area_sq_km": 5.1,
+    "lithology": "Biotite Gneiss / Amphibolite Basement",
+    "structural_density": 0.28,
+    "lineament_density": 0.32,
+    "spectral_alteration_index": 0.22,
+    "distance_to_known_deposit_km": 9.1,
+    "elevation_m": 330.0,
+    "slope_deg": 5.4,
+    "drainage_density": 0.38,
+    "terrain_ruggedness": 0.25,
+    "historical_prospect_points": 1,
+    "known_manganese_occurrences": false,
+    "true_prospectivity_prob": 0.22,
+    "prospectivity_tier": "LOW",
+    "recommended_action": "Low exploration priority; standard regional reconnaissance."
+  },
+  {
+    "id": "ZONE_D",
+    "name": "Zone D - Dongri Buzurg East Shear",
+    "center": [
+      21.865,
+      79.805
+    ],
+    "area_sq_km": 5.5,
+    "lithology": "Gondite & Secondary Supergene Enriched Pyrolusite",
+    "structural_density": 0.91,
+    "lineament_density": 0.89,
+    "spectral_alteration_index": 0.86,
+    "distance_to_known_deposit_km": 1.6,
+    "elevation_m": 425.0,
+    "slope_deg": 16.2,
+    "drainage_density": 0.7,
+    "terrain_ruggedness": 0.62,
+    "historical_prospect_points": 12,
+    "known_manganese_occurrences": true,
+    "true_prospectivity_prob": 0.89,
+    "prospectivity_tier": "VERY HIGH",
+    "recommended_action": "Fast-track exploratory borehole drilling and assay evaluation."
+  },
+  {
+    "id": "ZONE_E",
+    "name": "Zone E - Bharweli South Deep Syncline",
+    "center": [
+      21.83,
+      79.83
+    ],
+    "area_sq_km": 7.0,
+    "lithology": "Mansar Phyllite & Manganiferous Quartzite",
+    "structural_density": 0.62,
+    "lineament_density": 0.58,
+    "spectral_alteration_index": 0.55,
+    "distance_to_known_deposit_km": 4.1,
+    "elevation_m": 365.0,
+    "slope_deg": 9.8,
+    "drainage_density": 0.48,
+    "terrain_ruggedness": 0.39,
+    "historical_prospect_points": 6,
+    "known_manganese_occurrences": true,
+    "true_prospectivity_prob": 0.59,
+    "prospectivity_tier": "MODERATE",
+    "recommended_action": "Evaluate subsurface structural plunge via 2D seismic/IP survey."
+  },
+  {
+    "id": "ZONE_F",
+    "name": "Zone F - Alluvial Sedimentary Basin",
+    "center": [
+      21.785,
+      79.85
+    ],
+    "area_sq_km": 8.4,
+    "lithology": "Recent Alluvium / Deccan Trap Overburden",
+    "structural_density": 0.15,
+    "lineament_density": 0.18,
+    "spectral_alteration_index": 0.16,
+    "distance_to_known_deposit_km": 12.5,
+    "elevation_m": 310.0,
+    "slope_deg": 3.1,
+    "drainage_density": 0.3,
+    "terrain_ruggedness": 0.15,
+    "historical_prospect_points": 0,
+    "known_manganese_occurrences": false,
+    "true_prospectivity_prob": 0.11,
+    "prospectivity_tier": "LOW",
+    "recommended_action": "Unfavorable stratigraphy for open-cast or shallow manganese."
+  }
+]

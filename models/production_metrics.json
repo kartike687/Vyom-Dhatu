@@ -1,0 +1,26 @@
+{
+  "SARIMA / Autoregressive Baseline": {
+    "model_type": "Statistical Time-Series",
+    "mae": 209.8,
+    "rmse": 251.6,
+    "mape_pct": 15.39,
+    "r2_score": -0.223,
+    "best_model": false
+  },
+  "Random Forest Regressor": {
+    "model_type": "Machine Learning",
+    "mae": 103.1,
+    "rmse": 153.1,
+    "mape_pct": 8.06,
+    "r2_score": 0.547,
+    "best_model": false
+  },
+  "XGBoost Regressor": {
+    "model_type": "Machine Learning",
+    "mae": 103.6,
+    "rmse": 147.3,
+    "mape_pct": 7.8,
+    "r2_score": 0.581,
+    "best_model": true
+  }
+}
