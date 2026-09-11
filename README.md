@@ -3,6 +3,13 @@
 > **"Using AI/ML and Space Technology to Identify Manganese Reserves and Overcome Production Shortfalls."**  
 > *Targeted for MOIL Limited (Balaghat, Ukwa, Dongri Buzurg, Tirodi Manganese Belt — Central India)*
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vyom-dhatu-yc1h.vercel.app/)
+[![API Docs](https://img.shields.io/badge/Swagger_Docs-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://vyom-dhatu-yc1h.vercel.app/docs)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Vyom--Dhatu-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/kartike687/Vyom-Dhatu)
+
+🌐 **Live Deployment**: [https://vyom-dhatu-yc1h.vercel.app/](https://vyom-dhatu-yc1h.vercel.app/)  
+📖 **Interactive Swagger Docs**: [https://vyom-dhatu-yc1h.vercel.app/docs](https://vyom-dhatu-yc1h.vercel.app/docs)
+
 ---
 
 ## 1. Executive Summary & Problem Overview
@@ -88,11 +95,18 @@ Calculates prioritized, constraint-compliant operational levers that recover up 
 
 ---
 
-## 5. Live Local Execution
+## 5. Live Deployment & Execution
 
-The server is running locally on your machine at:
+### 🌐 Cloud Production Deployment (Vercel)
+The complete platform and API are deployed and accessible worldwide:
+- **Live Platform URL**: [https://vyom-dhatu-yc1h.vercel.app/](https://vyom-dhatu-yc1h.vercel.app/)
+- **Interactive Swagger API Docs**: [https://vyom-dhatu-yc1h.vercel.app/docs](https://vyom-dhatu-yc1h.vercel.app/docs)
+- **Database Status Endpoint**: [https://vyom-dhatu-yc1h.vercel.app/api/db/status](https://vyom-dhatu-yc1h.vercel.app/api/db/status)
+
+### 💻 Local Offline Development
+To run locally on your machine:
 - **Local Application URL**: [http://127.0.0.1:8000](http://127.0.0.1:8000)
-- **Interactive Swagger API Docs**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **Local Swagger API Docs**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
 To launch anytime from terminal or file explorer:
 ```powershell
