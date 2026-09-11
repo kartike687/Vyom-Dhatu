@@ -27,12 +27,19 @@ from ml.production_engine import generate_30day_forecast
 from ml.root_cause_engine import explain_production_shortfall
 from ml.subsurface_interpolator import compute_reserve_estimation, generate_3d_block_model
 from ml.optimizer_engine import optimize_production_recovery
+from backend.app.db import db
 
 app = FastAPI(
     title="MOIL Manganese Mine Intelligence & Digital Twin API",
     description="Digital twin simulation platform combining AI/ML, Earth Observation GIS, and Operations Research for MOIL Limited.",
     version="2.6.0"
 )
+
+@app.get("/api/db/status")
+def get_db_status():
+    """Returns connectivity and health status of the Supabase database."""
+    return db.health_check()
+
 
 app.add_middleware(
     CORSMiddleware,

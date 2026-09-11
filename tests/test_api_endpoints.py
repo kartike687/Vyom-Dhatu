@@ -22,9 +22,17 @@ from backend.app.main import (
     run_what_if_simulation,
     apply_optimization_interventions,
     toggle_fallback_mode,
+    get_db_status,
     DrillSimulateRequest,
     WhatIfRequest
 )
+
+def test_db_status():
+    status = get_db_status()
+    assert "url" in status
+    assert "supabase.co" in status["url"]
+    assert "connected" in status
+
 
 def test_dashboard_summary():
     data = get_dashboard_summary()
